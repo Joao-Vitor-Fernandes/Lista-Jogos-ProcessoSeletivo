@@ -167,11 +167,11 @@ const Home: React.FC = () => {
 
                 {visiblePageNumbers.map((page) => (
                   <Button
-                    key={page}
+                    key={String(page)}
                     colorScheme={currentPage === page ? 'teal' : undefined}
-                    onClick={() => handlePageChange(page)}
+                    onClick={() => handlePageChange(Number(page))}
                   >
-                    {page}
+                    {String(page)}
                   </Button>
                 ))}
 
