@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Container, Grid, Heading, Spinner, Text } from '@chakra-ui/react';
+import { Box, Container, Grid, HStack, Heading, Spinner, Text } from '@chakra-ui/react';
 import axios, { AxiosError } from 'axios';
 import { Card } from '@/components/Card/card';
-// import Card from './Card';
-// import CampoPesquisa from './CampoPesquisa';
+import { CampoPesquisa } from '@/components/CampoPesquisa/campoPesquisa';
 // import SelectGenre from './SelectGenre';
 
 type Game = {
@@ -91,14 +90,20 @@ const Home: React.FC = () => {
 
   return (
     <Container maxW="container.lg" py={8}>
-      <Heading as="h1" mb={4}>
-        Lista de Jogos
-      </Heading>
-      <Box mb={4}>
-        {/* <CampoPesquisa value={search} onChange={handleSearch} /> */}
-        {/* <SelectGenre value={selectedGenre} onChange={handleGenreChange} genres={uniqueGenres} /> */}
-      </Box>
-      {loading ? (<Spinner size="xl" />) : error ? (<Text color="red.500">{error}</Text>) : (
+      <HStack as='section' w={'100%'} justifyContent={'space-between'}>
+        <Text as="h1" fontSize={'4xl'} fontWeight={'700'} mb={4}>
+          Lista de Jogos
+        </Text>
+
+        <Box mb={4}>
+          <CampoPesquisa value={search} onChange={handleSearch} />
+          {/* <SelectGenre value={selectedGenre} onChange={handleGenreChange} genres={uniqueGenres} /> */}
+        </Box>
+      </HStack>
+
+      {loading ? (<Spinner size="xl" />) : error ? (<Text color="red.500">{error}</Text>) : filteredGames.length === 0 ? (
+        <Text as='p' fontSize={'20'} fontWeight={'bold'} textAlign={'center'} p={8}>Nenhum resultado encontrado.</Text>
+      ) : (
         <Grid templateColumns={['1fr', 'repeat(3, 1fr)']} gap={4}>
           {filteredGames.map((game, index) => (
             <Card key={index} {...game} />
