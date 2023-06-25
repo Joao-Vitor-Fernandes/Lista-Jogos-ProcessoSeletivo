@@ -1,4 +1,4 @@
-import { Button, Flex, HStack, IconButton, Menu, MenuButton, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { Button, Flex, HStack, IconButton, Menu, MenuButton, MenuItem, MenuList, Text, useBreakpointValue } from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
@@ -6,7 +6,12 @@ import { useState } from "react";
 
 import logo from "../../../public/logo.png";
 
+// responsividade:
+//     base     sm      md      lg      xl
+// ={['flex', 'none', 'none', 'flex', 'flex']}
+
 export function Navbar() {
+    const displayText = useBreakpointValue({ base: "none", sm: "text" , md: "text" });
     const [isMenuOpen, setMenuOpen] = useState(false);
 
     const handleMenuToggle = () => {
@@ -19,8 +24,10 @@ export function Navbar() {
             pt="2"
             pb="2"
             pl="4"
-            pr="12"
-            bg="gray.800"
+            pr={["4", "8", "12", "12", "12"]}
+            // bg="gray.800"
+            bg="linear-gradient(178deg, rgba(28,36,44,1) 68%, rgba(0,0,0,1) 100%)"
+            // bg="linear-gradient(359deg, rgba(28,36,44,1) 6%, rgba(20,4,12,1) 27%)"
             justifyContent="space-between"
         >
             <HStack as="section">
@@ -40,6 +47,7 @@ export function Navbar() {
                         fontWeight="700"
                         color="#316be2"
                         lineHeight="1"
+                        display={displayText}
                     >
                         App Masters Gaming
                     </Text>
