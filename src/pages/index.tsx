@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Container, Grid, HStack, Heading, Spinner, Text } from '@chakra-ui/react';
+import { Box, Container, Flex, Grid, HStack, Heading, Spinner, Text } from '@chakra-ui/react';
 import axios, { AxiosError } from 'axios';
 import { Card } from '@/components/Card/card';
 import { CampoPesquisa } from '@/components/CampoPesquisa/campoPesquisa';
+import { SelectGenre } from '@/components/CampoSelect/SelectGenre';
 // import SelectGenre from './SelectGenre';
 
 type Game = {
@@ -86,7 +87,7 @@ const Home: React.FC = () => {
     setSelectedGenre(event.target.value);
   };
 
-  // const uniqueGenres = [...new Set(games.map((game) => game.genre))];
+  const uniqueGenres = [...new Set(games.map((game) => game.genre))];
 
   return (
     <Container maxW="container.lg" py={8}>
@@ -95,14 +96,29 @@ const Home: React.FC = () => {
           Lista de Jogos
         </Text>
 
-        <Box mb={4}>
+        <Box mb={4} display={'flex'} gap={'4'}>
           <CampoPesquisa value={search} onChange={handleSearch} />
-          {/* <SelectGenre value={selectedGenre} onChange={handleGenreChange} genres={uniqueGenres} /> */}
+          <SelectGenre value={selectedGenre} onChange={handleGenreChange} genres={uniqueGenres} />
         </Box>
       </HStack>
 
-      {loading ? (<Spinner size="xl" />) : error ? (<Text color="red.500">{error}</Text>) : filteredGames.length === 0 ? (
-        <Text as='p' fontSize={'20'} fontWeight={'bold'} textAlign={'center'} p={8}>Nenhum resultado encontrado.</Text>
+      {loading ? (
+        <Flex
+          mt={'12'}
+          alignItems="center"
+          justifyContent="center"
+          flexDirection={'column'}
+          gap={'4'}
+        >
+          <Spinner size="xl" />
+          <Text as="p">
+            Carregando
+          </Text>
+        </Flex>
+      ) : error ? (<Text color="red.500">{error}</Text>) : filteredGames.length === 0 ? (
+        <Text as="p" fontSize="20" fontWeight="bold" textAlign="center" p={8}>
+          Nenhum resultado encontrado.
+        </Text>
       ) : (
         <Grid templateColumns={['1fr', 'repeat(3, 1fr)']} gap={4}>
           {filteredGames.map((game, index) => (
