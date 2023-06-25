@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Card } from '@/components/Card/card';
 import { CampoPesquisa } from '@/components/CampoPesquisa/campoPesquisa';
 import { SelectGenre } from '@/components/CampoSelect/SelectGenre';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 
 type Game = {
   title: string;
@@ -75,11 +76,12 @@ const Home: React.FC = () => {
       }
 
       setFilteredGames(filtered);
-      setCurrentPage(1); // Reset the current page when applying filters
+      setCurrentPage(1);
     };
 
     filterGames();
   }, [games, search, selectedGenre]);
+
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -94,6 +96,12 @@ const Home: React.FC = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+
+  const handleEllipsisClick = () => {
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+  };
+
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -128,19 +136,19 @@ const Home: React.FC = () => {
           Lista de Jogos
         </Text>
 
-        <Box mb={4} display="flex" gap={4}>
+        <Box as='section' mb={4} display="flex" gap={4}>
           <CampoPesquisa value={search} onChange={handleSearch} />
           <SelectGenre value={selectedGenre} onChange={handleGenreChange} genres={uniqueGenres} />
         </Box>
       </HStack>
 
       {loading ? (
-        <Flex mt={12} alignItems="center" justifyContent="center" flexDirection="column" gap={4}>
+        <Flex as='div' mt={12} alignItems="center" justifyContent="center" flexDirection="column" gap={4}>
           <Spinner size="xl" />
           <Text as="p">Carregando</Text>
         </Flex>
       ) : error ? (
-        <Text color="red.500">{error}</Text>
+        <Text as='p' color="red.500">{error}</Text>
       ) : paginatedGames.length === 0 ? (
         <Text as="p" fontSize="20" fontWeight="bold" textAlign="center" p={8}>
           Nenhum resultado encontrado.
@@ -149,38 +157,54 @@ const Home: React.FC = () => {
         <>
           <Grid templateColumns={['1fr', 'repeat(3, 1fr)']} gap={4}>
             {paginatedGames.map((game, index) => (
-              <Card key={index} {...game} />
+              <Card game_url={''} key={index} {...game} />
             ))}
           </Grid>
 
           {showPagination && (
-            <Flex mt={4} justifyContent="center">
+            <Flex as='div' mt={"12"} justifyContent="center">
               <ButtonGroup>
                 {canGoPrevious && (
                   <Button
+                    color={'white'}
+                    bg={'transparent'}
                     colorScheme="teal"
+                    variant='link'
                     onClick={() => handlePageChange(currentPage - 1)}
                   >
-                    Anterior
+                    <ChevronLeftIcon />
                   </Button>
                 )}
 
-                {visiblePageNumbers.map((page) => (
-                  <Button
-                    key={String(page)}
-                    colorScheme={currentPage === page ? 'teal' : undefined}
-                    onClick={() => handlePageChange(Number(page))}
-                  >
-                    {String(page)}
-                  </Button>
+                {visiblePageNumbers.map((page, index) => (
+                  <React.Fragment key={index}>
+                    {page === '...' ? (
+                      <Button color={'white'} bg={'transparent'} colorScheme="teal" variant='link' onClick={handleEllipsisClick}>
+                        {page}
+                      </Button>
+                    ) : (
+                      <Button
+                        color={'white'}
+                        bg={'transparent'}
+                        variant='link'
+                        colorScheme={currentPage === page ? 'teal' : undefined}
+                        onClick={() => handlePageChange(Number(page))}
+                      >
+                        {String(page)}
+                      </Button>
+                    )}
+                  </React.Fragment>
                 ))}
 
                 {canGoNext && (
                   <Button
+                    color={'white'}
+                    bg={'transparent'}
                     colorScheme="teal"
+                    variant='link'
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
-                    Próxima
+                    <ChevronRightIcon />
                   </Button>
                 )}
               </ButtonGroup>
