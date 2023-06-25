@@ -16,6 +16,7 @@ export function CampoPesquisa({ value, onChange }: CampoPesquisaProps) {
       value={value}
       onChange={onChange}
       w={'100%'}
+      pr={'20'}
     />
   );
 }

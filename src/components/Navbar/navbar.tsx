@@ -21,8 +21,7 @@ export function Navbar() {
     return (
         <HStack
             as="nav"
-            pt="2"
-            pb="2"
+            py="2"
             pl="4"
             pr={["4", "8", "12", "12", "12"]}
             // bg="gray.800"
