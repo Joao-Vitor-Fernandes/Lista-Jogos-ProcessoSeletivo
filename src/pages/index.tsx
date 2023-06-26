@@ -1,16 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Container,
-  Flex,
-  Grid,
-  HStack,
-  Heading,
-  Spinner,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Container, Flex, Grid, HStack, Heading, Spinner, Text, } from '@chakra-ui/react';
 import axios from 'axios';
 import { Card } from '@/components/Card/card';
 import { CampoPesquisa } from '@/components/CampoPesquisa/campoPesquisa';
@@ -25,6 +14,7 @@ type Game = {
 };
 
 const API_URL = 'https://games-test-api-81e9fb0d564a.herokuapp.com/api/data/';
+
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);

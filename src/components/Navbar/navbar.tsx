@@ -6,10 +6,6 @@ import { useState } from "react";
 
 import logo from "../../../public/logo.png";
 
-// responsividade:
-//     base     sm      md      lg      xl
-// ={['flex', 'none', 'none', 'flex', 'flex']}
-
 export function Navbar() {
     const displayText = useBreakpointValue({ base: "none", sm: "text" , md: "text" });
     const [isMenuOpen, setMenuOpen] = useState(false);
@@ -24,9 +20,7 @@ export function Navbar() {
             py="2"
             pl="4"
             pr={["4", "8", "12", "12", "12"]}
-            // bg="gray.800"
             bg="linear-gradient(178deg, rgba(28,36,44,1) 68%, rgba(0,0,0,1) 100%)"
-            // bg="linear-gradient(359deg, rgba(28,36,44,1) 6%, rgba(20,4,12,1) 27%)"
             justifyContent="space-between"
         >
             <HStack as="section">
