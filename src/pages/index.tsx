@@ -189,7 +189,7 @@ const Home: React.FC = () => {
           {error}
         </Text>
       ) : paginatedGames.length === 0 ? (
-        <Text as="p" fontSize="20" fontWeight="bold" textAlign="center" p={8} mt={'10%'} mb={'60%'}>
+        <Text as="p" fontSize="20" fontWeight="bold" textAlign="center" p={8} mb={'60%'}>
           Nenhum resultado encontrado.
         </Text>
       ) : (
@@ -216,6 +216,9 @@ const Home: React.FC = () => {
                   <Button
                     color={'white'}
                     bg={'transparent'}
+                    size={'sm'}
+                    p={'0'}
+                    m={'0'}
                     colorScheme="teal"
                     variant="link"
                     onClick={() => handlePageChange(currentPage - 1)}
@@ -230,6 +233,9 @@ const Home: React.FC = () => {
                       <Button
                         color={'white'}
                         bg={'transparent'}
+                        size={'sm'}
+                        p={'0'}
+                        m={'0'}
                         colorScheme="teal"
                         variant="link"
                         onClick={handleEllipsisClick}
@@ -241,6 +247,9 @@ const Home: React.FC = () => {
                       <Button
                         color={'white'}
                         bg={'transparent'}
+                        size={'sm'}
+                        p={'0'}
+                        m={'0'}
                         variant="link"
                         colorScheme={currentPage === page ? 'teal' : undefined}
                         onClick={() => handlePageChange(Number(page))}
@@ -255,6 +264,9 @@ const Home: React.FC = () => {
                   <Button
                     color={'white'}
                     bg={'transparent'}
+                    size={'sm'}
+                    p={'0'}
+                    m={'0'}
                     colorScheme="teal"
                     variant="link"
                     onClick={() => handlePageChange(currentPage + 1)}

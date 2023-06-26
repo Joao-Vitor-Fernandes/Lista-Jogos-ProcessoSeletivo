@@ -27,6 +27,7 @@ export function Footer() {
                 alignItems='center' 
                 borderBottom={['1px','1px','1px','0','0']} 
                 borderColor={'#617582'}
+                pl={['0', '0', '0', '8', '8']}
                 mb={['4','4','4','0','0']}
             >
                 <HStack as={'div'}>
