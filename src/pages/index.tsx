@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, ButtonGroup, Container, Flex, Grid, HStack, Heading, Spinner, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Container,
+  Flex,
+  Grid,
+  HStack,
+  Heading,
+  Spinner,
+  Text,
+} from '@chakra-ui/react';
 import axios from 'axios';
 import { Card } from '@/components/Card/card';
 import { CampoPesquisa } from '@/components/CampoPesquisa/campoPesquisa';
@@ -32,8 +43,8 @@ const Home: React.FC = () => {
       try {
         const response = await axios.get(API_URL, {
           headers: {
-            'dev-email-address': 'joviramos16@gmail.com'
-          }
+            'dev-email-address': 'joviramos16@gmail.com',
+          },
         });
 
         setGames(response.data);
@@ -45,7 +56,9 @@ const Home: React.FC = () => {
           if ([500, 502, 503, 504, 507, 508, 509].includes(status)) {
             setError('O servidor falhou em responder, tente recarregar a página');
           } else {
-            setError('O servidor não conseguirá responder por agora, tente voltar novamente mais tarde');
+            setError(
+              'O servidor não conseguirá responder por agora, tente voltar novamente mais tarde'
+            );
           }
         } else if (error.request) {
           setError('O servidor demorou para responder, tente mais tarde');
@@ -82,12 +95,13 @@ const Home: React.FC = () => {
     filterGames();
   }, [games, search, selectedGenre]);
 
-
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
 
-  const handleGenreChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleGenreChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setSelectedGenre(event.target.value);
   };
 
@@ -101,7 +115,6 @@ const Home: React.FC = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
   };
-
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -131,45 +144,80 @@ const Home: React.FC = () => {
 
   return (
     <Container maxW="container.lg" py={8}>
-      <HStack as="section" w="100%" justifyContent="space-between">
+      <HStack
+        as="section"
+        w="100%"
+        justifyContent="space-between"
+        flexDirection={['column', 'row', 'row', 'row', 'row']}
+      >
         <Text as="h1" fontSize="4xl" fontWeight="700" mb={4}>
           Lista de Jogos
         </Text>
 
-        <Box as='section' mb={4} display="flex" gap={4}>
+        <Box
+          as="section"
+          mb={4}
+          display="flex"
+          gap={4}
+          flexDirection={['column', 'column', 'row', 'row', 'row']}
+        >
           <CampoPesquisa value={search} onChange={handleSearch} />
-          <SelectGenre value={selectedGenre} onChange={handleGenreChange} genres={uniqueGenres} />
+          <SelectGenre
+            value={selectedGenre}
+            onChange={handleGenreChange}
+            genres={uniqueGenres}
+          />
         </Box>
       </HStack>
 
       {loading ? (
-        <Flex as='div' mt={12} alignItems="center" justifyContent="center" flexDirection="column" gap={4}>
+        <Flex
+          as="div"
+          mt={12}
+          alignItems="center"
+          justifyContent="center"
+          flexDirection="column"
+          gap={4}
+        >
           <Spinner size="xl" />
-          <Text as="p">Carregando</Text>
+          <Text as="p" mb={'60%'}>
+            Carregando
+          </Text>
         </Flex>
       ) : error ? (
-        <Text as='p' color="red.500">{error}</Text>
+        <Text as="p" color="red.500" mb={'60%'} mt={'5%'} textAlign={'center'}>
+          {error}
+        </Text>
       ) : paginatedGames.length === 0 ? (
-        <Text as="p" fontSize="20" fontWeight="bold" textAlign="center" p={8}>
+        <Text as="p" fontSize="20" fontWeight="bold" textAlign="center" p={8} mt={'10%'} mb={'60%'}>
           Nenhum resultado encontrado.
         </Text>
       ) : (
         <>
-          <Grid templateColumns={['1fr', 'repeat(3, 1fr)']} gap={4}>
+          <Grid
+            templateColumns={{
+              base: '1fr',
+              sm: '1fr',
+              xs: 'repeat(2, 1fr)',
+              md: 'repeat(2, 1fr)',
+              lg: 'repeat(3, 1fr)',
+            }}
+            gap={[4, 4, 4, 6, 8]}
+          >
             {paginatedGames.map((game, index) => (
               <Card game_url={''} key={index} {...game} />
             ))}
           </Grid>
 
           {showPagination && (
-            <Flex as='div' mt={"12"} justifyContent="center">
+            <Flex as="div" mt={'12'} justifyContent="center">
               <ButtonGroup>
                 {canGoPrevious && (
                   <Button
                     color={'white'}
                     bg={'transparent'}
                     colorScheme="teal"
-                    variant='link'
+                    variant="link"
                     onClick={() => handlePageChange(currentPage - 1)}
                   >
                     <ChevronLeftIcon />
@@ -179,14 +227,21 @@ const Home: React.FC = () => {
                 {visiblePageNumbers.map((page, index) => (
                   <React.Fragment key={index}>
                     {page === '...' ? (
-                      <Button color={'white'} bg={'transparent'} colorScheme="teal" variant='link' onClick={handleEllipsisClick}>
+                      <Button
+                        color={'white'}
+                        bg={'transparent'}
+                        colorScheme="teal"
+                        variant="link"
+                        onClick={handleEllipsisClick}
+                        display={['none', 'none', 'block', 'block', 'block']}
+                      >
                         {page}
                       </Button>
                     ) : (
                       <Button
                         color={'white'}
                         bg={'transparent'}
-                        variant='link'
+                        variant="link"
                         colorScheme={currentPage === page ? 'teal' : undefined}
                         onClick={() => handlePageChange(Number(page))}
                       >
@@ -201,7 +256,7 @@ const Home: React.FC = () => {
                     color={'white'}
                     bg={'transparent'}
                     colorScheme="teal"
-                    variant='link'
+                    variant="link"
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
                     <ChevronRightIcon />

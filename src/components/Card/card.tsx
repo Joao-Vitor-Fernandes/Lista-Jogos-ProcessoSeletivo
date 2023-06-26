@@ -19,7 +19,7 @@ export function Card({ title, thumbnail, genre, short_description, game_url, }: 
     };
 
     return (
-        <GridItem as="section">
+        <GridItem as="section" mx={{ base: '0',sm: '8', xs: '0', md: '0', lg: '0'}}>
             <Box
                 bg="#1c242c"
                 borderRadius="8"
@@ -30,7 +30,7 @@ export function Card({ title, thumbnail, genre, short_description, game_url, }: 
                 borderColor="transparent"
                 cursor="pointer"
                 w={'100%'}
-                minW={'300px'}
+                minW={'250px'}
                 minH={'350px'}
             >
                 <Box
@@ -44,6 +44,8 @@ export function Card({ title, thumbnail, genre, short_description, game_url, }: 
                         src={thumbnail}
                         alt={title}
                         objectFit="cover"
+                        width="100%"
+                        minW={'250px'}
                     />
                 </Box>
                 <Box as="div" pt={4} px={4}>
