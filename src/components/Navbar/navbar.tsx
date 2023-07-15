@@ -50,6 +50,7 @@ export function Navbar() {
             <Flex
                 as="section"
                 display={["none", "none", "none", "flex", "flex", "flex"]}
+                gap={'4'}
             >
                 <Link href={"/"}>
                     <Text
@@ -65,6 +66,38 @@ export function Navbar() {
                         }}
                     >
                         Lista de Jogos
+                    </Text>
+                </Link>
+                <Link href={"/login"}>
+                    <Text
+                        as="p"
+                        fontSize="28px"
+                        fontWeight="500"
+                        color="#316be2"
+                        position="relative"
+                        transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                        _hover={{
+                            color: "white",
+                            boxShadow: "inset 0 -4px 0 white",
+                        }}
+                    >
+                        Login
+                    </Text>
+                </Link>
+                <Link href={"/register"}>
+                    <Text
+                        as="p"
+                        fontSize="28px"
+                        fontWeight="500"
+                        color="#316be2"
+                        position="relative"
+                        transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                        _hover={{
+                            color: "white",
+                            boxShadow: "inset 0 -4px 0 white",
+                        }}
+                    >
+                        Cadastro
                     </Text>
                 </Link>
             </Flex>
