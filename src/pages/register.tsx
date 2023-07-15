@@ -3,7 +3,6 @@ import { Box, Button, Container, FormControl, FormLabel, Heading, Input, Link, T
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from 'config/firebase';
-// import auth from 'config/firebase'; // Importe o objeto auth do seu arquivo firebase.tsx
 
 const Cadastro: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -16,35 +15,10 @@ const Cadastro: React.FC = () => {
         error,
     ] = useCreateUserWithEmailAndPassword(auth);
 
-    function handleSignOut(e: { preventDefault: () => void; }) {
+    function handleSignCreate(e: { preventDefault: () => void; }) {
         e.preventDefault();
         createUserWithEmailAndPassword(email, password);
     }
-
-    // const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     setEmail(event.target.value);
-    // };
-
-    // const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     setPassword(event.target.value);
-    // };
-
-    // const handleSignUp = async () => {
-    //     try {
-    //         const auth = getAuth();
-    //         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    //         // Nova conta criada com sucesso, você pode redirecionar o usuário para a página principal
-    //         const user = userCredential.user;
-    //         console.log('Nova conta criada:', user);
-    //     } catch (error) {
-    //         console.error('Erro ao criar conta:', error);
-    //         if (error instanceof Error) {
-    //             setError('Ocorreu um erro ao criar a conta: ' + error.message);
-    //         } else {
-    //             setError('Ocorreu um erro ao criar a conta.');
-    //         }
-    //     }
-    // };
 
     if(loading) return <p>Carregando...</p>
     return (
@@ -65,13 +39,7 @@ const Cadastro: React.FC = () => {
                         <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                     </FormControl>
 
-                    {/* {error && (
-                        <Text color="red.500" mb={4}>
-                            {error}
-                        </Text>
-                    )} */}
-
-                    <Button colorScheme="teal" onClick={handleSignOut}>
+                    <Button colorScheme="teal" onClick={handleSignCreate}>
                         Criar conta
                     </Button>
 

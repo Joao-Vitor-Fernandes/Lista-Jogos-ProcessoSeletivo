@@ -19,25 +19,7 @@ const Login: React.FC = () => {
         e.preventDefault();
         signInWithEmailAndPassword(email, password);
     }
-
-    // const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     setEmail(event.target.value);
-    // };
-
-    // const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     setPassword(event.target.value);
-    // };
-
-    // const handleLogin = async () => {
-    //     try {
-    //         await signInWithEmailAndPassword(auth, email, password);
-    //         // Autenticação bem-sucedida, você pode redirecionar o usuário para a página principal
-    //     } catch (error) {
-    //         console.error(error);
-    //         // Tratar erros de autenticação aqui e fornecer feedback ao usuário
-    //     }
-    // };
-
+    
     if(loading) {
         return <p>Carregando...</p>
     }

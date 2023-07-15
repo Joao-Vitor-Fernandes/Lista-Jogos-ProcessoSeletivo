@@ -67,7 +67,7 @@ export function Footer() {
                 </Text>
             </Stack>
             <Stack as='section' alignItems='center' mr={['0', '0', '0', '8', '8']}>
-                <Link href={"https://www.appmasters.io"}>
+                <Link href={"https://www.appmasters.io"} target="_blank" rel="noopener noreferrer">
                     <Image
                         className="logo"
                         src={logo}

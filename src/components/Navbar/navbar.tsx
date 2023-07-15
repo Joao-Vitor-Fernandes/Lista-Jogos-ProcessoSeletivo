@@ -1,18 +1,30 @@
 import { Button, Flex, HStack, IconButton, Menu, MenuButton, MenuItem, MenuList, Text, useBreakpointValue } from "@chakra-ui/react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
-import { useState } from "react";
+import { signOut } from "firebase/auth"
+import { auth } from "config/firebase";
 
 import logo from "../../../public/logo.png";
 
 export function Navbar() {
-    const displayText = useBreakpointValue({ base: "none", sm: "text" , md: "text" });
+    const displayText = useBreakpointValue({ base: "none", sm: "text", md: "text" });
     const [isMenuOpen, setMenuOpen] = useState(false);
 
     const handleMenuToggle = () => {
         setMenuOpen(!isMenuOpen);
     };
+
+    const logout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const user = auth.currentUser; // Obtém o usuário atualmente autenticado
 
     return (
         <HStack
@@ -41,6 +53,11 @@ export function Navbar() {
                         color="#316be2"
                         lineHeight="1"
                         display={displayText}
+                        transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                        _hover={{
+                            color: "white",
+                            boxShadow: "inset 0 -2px 0 white",
+                        }}
                     >
                         App Masters Gaming
                     </Text>
@@ -52,54 +69,95 @@ export function Navbar() {
                 display={["none", "none", "none", "flex", "flex", "flex"]}
                 gap={'4'}
             >
-                <Link href={"/"}>
-                    <Text
-                        as="p"
-                        fontSize="28px"
-                        fontWeight="500"
-                        color="#316be2"
-                        position="relative"
-                        transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
-                        _hover={{
-                            color: "white",
-                            boxShadow: "inset 0 -4px 0 white",
-                        }}
-                    >
-                        Lista de Jogos
-                    </Text>
-                </Link>
-                <Link href={"/login"}>
-                    <Text
-                        as="p"
-                        fontSize="28px"
-                        fontWeight="500"
-                        color="#316be2"
-                        position="relative"
-                        transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
-                        _hover={{
-                            color: "white",
-                            boxShadow: "inset 0 -4px 0 white",
-                        }}
-                    >
-                        Login
-                    </Text>
-                </Link>
-                <Link href={"/register"}>
-                    <Text
-                        as="p"
-                        fontSize="28px"
-                        fontWeight="500"
-                        color="#316be2"
-                        position="relative"
-                        transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
-                        _hover={{
-                            color: "white",
-                            boxShadow: "inset 0 -4px 0 white",
-                        }}
-                    >
-                        Cadastro
-                    </Text>
-                </Link>
+                {user ? (
+                    <>
+                        <Link href={"/login"}>
+                            <Text
+                                as="p"
+                                fontSize="28px"
+                                fontWeight="500"
+                                color="#316be2"
+                                position="relative"
+                                transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                                _hover={{
+                                    color: "white",
+                                    boxShadow: "inset 0 -4px 0 white",
+                                }}
+                            >
+                                Lista de Jogos
+                            </Text>
+                        </Link>
+                        <Link href={"#"}>
+                            <Text
+                                as="p"
+                                fontSize="28px"
+                                fontWeight="500"
+                                color="#316be2"
+                                position="relative"
+                                transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                                _hover={{
+                                    color: "white",
+                                    boxShadow: "inset 0 -4px 0 white",
+                                }}
+                                onClick={logout}
+                            >
+                                Logout
+                            </Text>
+                        </Link>
+                    </>
+                ) : (
+                    // Se o usuário não estiver logado, exiba os links de login e cadastro
+                    <>
+                        <Link href={"/"}>
+                            <Text
+                                as="p"
+                                fontSize="28px"
+                                fontWeight="500"
+                                color="#316be2"
+                                position="relative"
+                                transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                                _hover={{
+                                    color: "white",
+                                    boxShadow: "inset 0 -4px 0 white",
+                                }}
+                            >
+                                Lista de Jogos
+                            </Text>
+                        </Link>
+                        <Link href={"/login"}>
+                            <Text
+                                as="p"
+                                fontSize="28px"
+                                fontWeight="500"
+                                color="#316be2"
+                                position="relative"
+                                transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                                _hover={{
+                                    color: "white",
+                                    boxShadow: "inset 0 -4px 0 white",
+                                }}
+                            >
+                                Login
+                            </Text>
+                        </Link>
+                        <Link href={"/register"}>
+                            <Text
+                                as="p"
+                                fontSize="28px"
+                                fontWeight="500"
+                                color="#316be2"
+                                position="relative"
+                                transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                                _hover={{
+                                    color: "white",
+                                    boxShadow: "inset 0 -4px 0 white",
+                                }}
+                            >
+                                Cadastro
+                            </Text>
+                        </Link>
+                    </>
+                )}
             </Flex>
 
             <Menu>
@@ -118,18 +176,76 @@ export function Navbar() {
                     onClick={handleMenuToggle}
                 />
                 <MenuList>
-                    <MenuItem>
-                        <Link href={"/"}>
-                            <Text
-                                as="p"
-                                fontSize="20px"
-                                fontWeight="500"
-                                color="#316be2"
-                            >
-                                Lista de Jogos
-                            </Text>
-                        </Link>
-                    </MenuItem>
+                    {user ? (
+                        <>
+                            <MenuItem>
+                                <Link href={"/"}>
+                                    <Text
+                                        as="p"
+                                        fontSize="20px"
+                                        fontWeight="500"
+                                        color="#316be2"
+                                    >
+                                        Lista de Jogos
+                                    </Text>
+                                </Link>
+                            </MenuItem>
+                            <MenuItem>
+                                <Link href={"#"}>
+                                    <Text
+                                        as="p"
+                                        fontSize="20px"
+                                        fontWeight="500"
+                                        color="#316be2"
+                                        onClick={logout}
+                                    >
+                                        Logout
+                                    </Text>
+                                </Link>
+                            </MenuItem>
+                        </>
+                    ) : (
+                        <>
+                            <MenuItem>
+                                <Link href={"/"}>
+                                    <Text
+                                        as="p"
+                                        fontSize="20px"
+                                        fontWeight="500"
+                                        color="#316be2"
+                                    >
+                                        Lista de Jogos
+                                    </Text>
+                                </Link>
+                            </MenuItem>
+                            <MenuItem>
+                                <Link href={"/login"}>
+                                    <Text
+                                        as="p"
+                                        fontSize="20px"
+                                        fontWeight="500"
+                                        color="#316be2"
+                                        onClick={logout}
+                                    >
+                                        Login
+                                    </Text>
+                                </Link>
+                            </MenuItem>
+                            <MenuItem>
+                                <Link href={"/register"}>
+                                    <Text
+                                        as="p"
+                                        fontSize="20px"
+                                        fontWeight="500"
+                                        color="#316be2"
+                                        onClick={logout}
+                                    >
+                                        Cadastro
+                                    </Text>
+                                </Link>
+                            </MenuItem>
+                        </>
+                    )}
                 </MenuList>
             </Menu>
         </HStack>
