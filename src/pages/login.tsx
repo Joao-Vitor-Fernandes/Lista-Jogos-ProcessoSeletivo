@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Box, Button, Container, FormControl, FormLabel, Heading, Input, Link, Text } from '@chakra-ui/react';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import auth from 'config/firebase'; // Importe o objeto auth do seu arquivo firebase.tsx
 
-const LoginPage: React.FC = () => {
+const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -13,22 +15,24 @@ const LoginPage: React.FC = () => {
         setPassword(event.target.value);
     };
 
-    const handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-
-        // Aqui você pode adicionar a lógica para fazer o login com os dados fornecidos
-        // Exemplo:
-        // authService.login(email, password);
+    const handleLogin = async () => {
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            // Autenticação bem-sucedida, você pode redirecionar o usuário para a página principal
+        } catch (error) {
+            console.error(error);
+            // Tratar erros de autenticação aqui e fornecer feedback ao usuário
+        }
     };
 
     return (
         <Container maxW="container.sm" py={8}>
-            <Box bg="white" p={8} borderRadius="md" boxShadow="md">
+            <Box bg="#1c242c" p={8} borderRadius="md" boxShadow="md">
                 <Heading as="h1" fontSize="xl" mb={4}>
                     Login
                 </Heading>
 
-                <form onSubmit={handleSubmit}>
+                <form>
                     <FormControl id="email" mb={4}>
                         <FormLabel>Email</FormLabel>
                         <Input type="email" value={email} onChange={handleEmailChange} />
@@ -39,17 +43,17 @@ const LoginPage: React.FC = () => {
                         <Input type="password" value={password} onChange={handlePasswordChange} />
                     </FormControl>
 
-                    <Button colorScheme="teal" type="submit">
+                    <Button colorScheme="teal" onClick={handleLogin}>
                         Login
                     </Button>
-                </form>
 
-                <Text mt={4} fontSize="sm" color="gray.500">
-                    Ainda não tem uma conta? <Link href="/register">Crie uma aqui</Link>.
-                </Text>
+                    <Text mt={4} fontSize="sm" color="gray.500">
+                        Não tem uma conta? <Link href="/register">Crie uma aqui</Link>.
+                    </Text>
+                </form>
             </Box>
         </Container>
     );
 };
 
-export default LoginPage;
+export default Login;
