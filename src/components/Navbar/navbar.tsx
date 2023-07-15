@@ -1,9 +1,9 @@
 import { Button, Flex, HStack, IconButton, Menu, MenuButton, MenuItem, MenuList, Text, useBreakpointValue } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
-import { signOut } from "firebase/auth"
+import { User, signOut } from "firebase/auth"
 import { auth } from "config/firebase";
 
 import logo from "../../../public/logo.png";
@@ -11,6 +11,8 @@ import logo from "../../../public/logo.png";
 export function Navbar() {
     const displayText = useBreakpointValue({ base: "none", sm: "text", md: "text" });
     const [isMenuOpen, setMenuOpen] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const handleMenuToggle = () => {
         setMenuOpen(!isMenuOpen);
@@ -24,7 +26,31 @@ export function Navbar() {
         }
     }
 
-    const user = auth.currentUser; // Obtém o usuário atualmente autenticado
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            setUser(user);
+            setIsLoading(false);
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    if (isLoading) {
+        return (
+            <HStack
+                as="nav"
+                py="2"
+                pl="4"
+                pr={["4", "8", "12", "12", "12"]}
+                bg="linear-gradient(178deg, rgba(28,36,44,1) 68%, rgba(0,0,0,1) 100%)"
+                justifyContent="space-between"
+            >
+                <Text color="white">Carregando...</Text>
+            </HStack>
+        );
+    }
 
     return (
         <HStack
@@ -69,9 +95,9 @@ export function Navbar() {
                 display={["none", "none", "none", "flex", "flex", "flex"]}
                 gap={'4'}
             >
-                {user ? (
+                {!isLoading && user ? (
                     <>
-                        <Link href={"/login"}>
+                        <Link href={"/"}>
                             <Text
                                 as="p"
                                 fontSize="28px"
@@ -176,7 +202,7 @@ export function Navbar() {
                     onClick={handleMenuToggle}
                 />
                 <MenuList>
-                    {user ? (
+                    {!isLoading && user ? (
                         <>
                             <MenuItem>
                                 <Link href={"/"}>
