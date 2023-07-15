@@ -1,38 +1,52 @@
 import React, { useState } from 'react';
 import { Box, Button, Container, FormControl, FormLabel, Heading, Input, Link, Text } from '@chakra-ui/react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import auth from 'config/firebase'; // Importe o objeto auth do seu arquivo firebase.tsx
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { auth } from 'config/firebase';
+// import auth from 'config/firebase'; // Importe o objeto auth do seu arquivo firebase.tsx
 
 const Cadastro: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState<string>('');
+    
+    const [
+        createUserWithEmailAndPassword,
+        user,
+        loading,
+        error,
+    ] = useCreateUserWithEmailAndPassword(auth);
 
-    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(event.target.value);
-    };
+    function handleSignOut(e: { preventDefault: () => void; }) {
+        e.preventDefault();
+        createUserWithEmailAndPassword(email, password);
+    }
 
-    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(event.target.value);
-    };
+    // const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     setEmail(event.target.value);
+    // };
 
-    const handleSignUp = async () => {
-        try {
-            const auth = getAuth();
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            // Nova conta criada com sucesso, você pode redirecionar o usuário para a página principal
-            const user = userCredential.user;
-            console.log('Nova conta criada:', user);
-        } catch (error) {
-            console.error('Erro ao criar conta:', error);
-            if (error instanceof Error) {
-                setError('Ocorreu um erro ao criar a conta: ' + error.message);
-            } else {
-                setError('Ocorreu um erro ao criar a conta.');
-            }
-        }
-    };
+    // const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     setPassword(event.target.value);
+    // };
 
+    // const handleSignUp = async () => {
+    //     try {
+    //         const auth = getAuth();
+    //         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    //         // Nova conta criada com sucesso, você pode redirecionar o usuário para a página principal
+    //         const user = userCredential.user;
+    //         console.log('Nova conta criada:', user);
+    //     } catch (error) {
+    //         console.error('Erro ao criar conta:', error);
+    //         if (error instanceof Error) {
+    //             setError('Ocorreu um erro ao criar a conta: ' + error.message);
+    //         } else {
+    //             setError('Ocorreu um erro ao criar a conta.');
+    //         }
+    //     }
+    // };
+
+    if(loading) return <p>Carregando...</p>
     return (
         <Container maxW="container.sm" py={8}>
             <Box bg="#1c242c" p={8} borderRadius="md" boxShadow="md">
@@ -43,21 +57,21 @@ const Cadastro: React.FC = () => {
                 <form>
                     <FormControl id="email" mb={4}>
                         <FormLabel>Email</FormLabel>
-                        <Input type="email" value={email} onChange={handleEmailChange} />
+                        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                     </FormControl>
 
                     <FormControl id="password" mb={6}>
                         <FormLabel>Password</FormLabel>
-                        <Input type="password" value={password} onChange={handlePasswordChange} />
+                        <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                     </FormControl>
 
-                    {error && (
+                    {/* {error && (
                         <Text color="red.500" mb={4}>
                             {error}
                         </Text>
-                    )}
+                    )} */}
 
-                    <Button colorScheme="teal" onClick={handleSignUp}>
+                    <Button colorScheme="teal" onClick={handleSignOut}>
                         Criar conta
                     </Button>
 
