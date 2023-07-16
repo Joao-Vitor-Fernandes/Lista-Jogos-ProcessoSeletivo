@@ -48,8 +48,12 @@ export function Card({
         ratingValue: number
     ) => {
         event.stopPropagation();
-        setUserRating(ratingValue);
-        onRatingClick(ratingValue);
+        if (auth.currentUser) {
+            setUserRating(ratingValue);
+            onRatingClick(ratingValue);
+        } else {
+            router.push('/login');
+        }
     };
 
     const renderFavoriteButton = () => {
@@ -202,11 +206,10 @@ export function Card({
                                 transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
                                 _hover={{
                                     color: 'white',
-                                    boxShadow: 'inset 0 -2px 0 white',
                                 }}
                                 onClick={handleLoginRedirect}
                             >
-                                L avaliar
+                                <AiOutlineHeart />
                             </Button>
                             <Button
                                 borderRadius="0"
@@ -215,11 +218,10 @@ export function Card({
                                 transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
                                 _hover={{
                                     color: 'white',
-                                    boxShadow: 'inset 0 -2px 0 white',
                                 }}
                                 onClick={handleLoginRedirect}
                             >
-                                L favoritar
+                                <BsStar />
                             </Button>
                         </>
                     )}
