@@ -7,6 +7,9 @@ import { SelectGenre } from '@/components/CampoSelect/SelectGenre';
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 
 type Game = {
+  game_url: string;
+  isFavorite: boolean;
+  rating: number;
   title: string;
   thumbnail: string;
   genre: string;
@@ -132,6 +135,18 @@ const Home: React.FC = () => {
     return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
   })();
 
+
+
+  function handleFavoriteClick(game: Game): void {
+    throw new Error('Function not implemented.');
+  }
+
+  function handleRatingClick(game: Game, ratingValue: number): void {
+    throw new Error('Function not implemented.');
+  }
+
+
+
   return (
     <Container maxW="container.lg" py={8}>
       <HStack
@@ -195,7 +210,17 @@ const Home: React.FC = () => {
             gap={[4, 4, 4, 6, 8]}
           >
             {paginatedGames.map((game, index) => (
-              <Card game_url={''} key={index} {...game} />
+              <Card
+                title={game.title}
+                thumbnail={game.thumbnail}
+                genre={game.genre}
+                short_description={game.short_description}
+                game_url={game.game_url}
+                isFavorite={game.isFavorite}
+                rating={game.rating}
+                onFavoriteClick={() => handleFavoriteClick(game)}
+                onRatingClick={(ratingValue) => handleRatingClick(game, ratingValue)}
+              />
             ))}
           </Grid>
 

@@ -2,6 +2,9 @@ import React from 'react';
 import { Box, Button, GridItem, Heading, Text } from '@chakra-ui/react';
 import { Image } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import { BsStarFill, BsStarHalf, BsStar } from 'react-icons/bs';
+import { auth } from 'config/firebase'; // Importe o objeto `auth` do Firebase
 
 type CardProps = {
     title: string;
@@ -9,17 +12,126 @@ type CardProps = {
     genre: string;
     short_description: string;
     game_url: string;
+    isFavorite: boolean;
+    rating: number;
+    onFavoriteClick: () => void;
+    onRatingClick: (rating: number) => void;
 };
 
-export function Card({ title, thumbnail, genre, short_description, game_url, }: CardProps) {
+export function Card({
+    title,
+    thumbnail,
+    genre,
+    short_description,
+    game_url,
+    isFavorite,
+    rating,
+    onFavoriteClick,
+    onRatingClick,
+}: CardProps) {
     const router = useRouter();
 
     const handleButtonClick = () => {
         window.open(game_url, '_blank');
     };
 
+    const handleFavoriteButtonClick = (
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
+        event.stopPropagation();
+        onFavoriteClick();
+    };
+
+    const handleRatingButtonClick = (
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        ratingValue: number
+    ) => {
+        event.stopPropagation();
+        onRatingClick(ratingValue);
+    };
+
+    const renderFavoriteButton = () => {
+        if (isFavorite) {
+            return (
+                <Button
+                    borderRadius="0"
+                    color="#316be2"
+                    variant="link"
+                    transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                    _hover={{
+                        color: 'white',
+                        boxShadow: 'inset 0 -2px 0 white',
+                    }}
+                    onClick={handleFavoriteButtonClick}
+                >
+                    <AiFillHeart />
+                </Button>
+            );
+        } else {
+            return (
+                <Button
+                    borderRadius="0"
+                    color="#316be2"
+                    variant="link"
+                    transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                    _hover={{
+                        color: 'white',
+                        boxShadow: 'inset 0 -2px 0 white',
+                    }}
+                    onClick={handleFavoriteButtonClick}
+                >
+                    <AiOutlineHeart />
+                </Button>
+            );
+        }
+    };
+
+    const renderRatingButtons = () => {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
+
+        const ratingButtons = [];
+
+        // Ajuste para exibir 4 estrelas
+        for (let i = 0; i < 4; i++) {
+            ratingButtons.push(
+                <Button
+                    key={i}
+                    borderRadius="0"
+                    color="#316be2"
+                    variant="link"
+                    transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                    _hover={{
+                        color: 'white',
+                        boxShadow: 'inset 0 -2px 0 white',
+                    }}
+                    onClick={(event) => handleRatingButtonClick(event, i + 1)}
+                >
+                    {i + 1 <= fullStars ? (
+                        <BsStarFill />
+                    ) : i + 1 === fullStars + 1 && hasHalfStar ? (
+                        <BsStarHalf />
+                    ) : (
+                        <BsStar />
+                    )}
+                </Button>
+            );
+        }
+
+        return ratingButtons;
+    };
+
+    const user = auth.currentUser; // Obtém o usuário atualmente autenticado
+
+    const handleLoginRedirect = () => {
+        router.push('/login');
+    };
+
     return (
-        <GridItem as="section" mx={{ base: '0',sm: '8', xs: '0', md: '0', lg: '0'}}>
+        <GridItem
+            as="section"
+            mx={{ base: '0', sm: '8', xs: '0', md: '0', lg: '0' }}
+        >
             <Box
                 bg="#1c242c"
                 borderRadius="8"
@@ -61,7 +173,7 @@ export function Card({ title, thumbnail, genre, short_description, game_url, }: 
                         </Text>
                     )}
                 </Box>
-                <Box as="div" p={4} display="flex" justifyContent="end">
+                <Box as="div" p={4} display="flex" justifyContent="end" gap={'2'}>
                     <a href={game_url} target="_blank" rel="noopener noreferrer">
                         <Button
                             borderRadius="0"
@@ -77,6 +189,41 @@ export function Card({ title, thumbnail, genre, short_description, game_url, }: 
                             Leia Mais
                         </Button>
                     </a>
+                    {user ? (
+                        <>
+                            {renderFavoriteButton()}
+                            <Box ml={2}>{renderRatingButtons()}</Box>
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                borderRadius="0"
+                                color="#316be2"
+                                variant="link"
+                                transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                                _hover={{
+                                    color: 'white',
+                                    boxShadow: 'inset 0 -2px 0 white',
+                                }}
+                                onClick={handleLoginRedirect}
+                            >
+                                L avaliar
+                            </Button>
+                            <Button
+                                borderRadius="0"
+                                color="#316be2"
+                                variant="link"
+                                transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                                _hover={{
+                                    color: 'white',
+                                    boxShadow: 'inset 0 -2px 0 white',
+                                }}
+                                onClick={handleLoginRedirect}
+                            >
+                                L favoritar
+                            </Button>
+                        </>
+                    )}
                 </Box>
             </Box>
         </GridItem>
