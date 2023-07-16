@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Button, GridItem, Heading, Text } from '@chakra-ui/react';
 import { Image } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BsStarFill, BsStarHalf, BsStar } from 'react-icons/bs';
-import { auth } from 'config/firebase'; // Importe o objeto `auth` do Firebase
+import { auth } from 'config/firebase';
 
 type CardProps = {
     title: string;
@@ -30,6 +30,7 @@ export function Card({
     onRatingClick,
 }: CardProps) {
     const router = useRouter();
+    const [userRating, setUserRating] = useState<number | null>(null);
 
     const handleButtonClick = () => {
         window.open(game_url, '_blank');
@@ -47,6 +48,7 @@ export function Card({
         ratingValue: number
     ) => {
         event.stopPropagation();
+        setUserRating(ratingValue);
         onRatingClick(ratingValue);
     };
 
@@ -60,11 +62,10 @@ export function Card({
                     transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
                     _hover={{
                         color: 'white',
-                        boxShadow: 'inset 0 -2px 0 white',
                     }}
                     onClick={handleFavoriteButtonClick}
                 >
-                    <AiFillHeart />
+                    <AiFillHeart color="red" />
                 </Button>
             );
         } else {
@@ -76,7 +77,6 @@ export function Card({
                     transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
                     _hover={{
                         color: 'white',
-                        boxShadow: 'inset 0 -2px 0 white',
                     }}
                     onClick={handleFavoriteButtonClick}
                 >
@@ -98,16 +98,15 @@ export function Card({
                 <Button
                     key={i}
                     borderRadius="0"
-                    color="#316be2"
+                    color={userRating !== null && i < userRating ? '#d1b238' : '#316be2'}
                     variant="link"
                     transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
                     _hover={{
                         color: 'white',
-                        boxShadow: 'inset 0 -2px 0 white',
                     }}
                     onClick={(event) => handleRatingButtonClick(event, i + 1)}
                 >
-                    {i + 1 <= fullStars ? (
+                    {i + 1 <= (userRating !== null ? userRating : fullStars) ? (
                         <BsStarFill />
                     ) : i + 1 === fullStars + 1 && hasHalfStar ? (
                         <BsStarHalf />

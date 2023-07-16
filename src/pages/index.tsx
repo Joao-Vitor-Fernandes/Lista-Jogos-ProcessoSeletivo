@@ -5,6 +5,8 @@ import { Card } from '@/components/Card/card';
 import { CampoPesquisa } from '@/components/CampoPesquisa/campoPesquisa';
 import { SelectGenre } from '@/components/CampoSelect/SelectGenre';
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { auth, db } from 'config/firebase';
+import { addDoc, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 
 type Game = {
   game_url: string;
@@ -17,7 +19,6 @@ type Game = {
 };
 
 const API_URL = 'https://games-test-api-81e9fb0d564a.herokuapp.com/api/data/';
-
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -135,17 +136,49 @@ const Home: React.FC = () => {
     return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
   })();
 
+  const handleFavoriteClick = (game: Game): void => {
+    // Atualiza o estado do jogo para favorito
+    const updatedGames = games.map((g) => {
+      if (g.game_url === game.game_url) {
+        return { ...g, isFavorite: !g.isFavorite };
+      }
+      return g;
+    });
 
+    setGames(updatedGames);
+  };
 
-  function handleFavoriteClick(game: Game): void {
-    throw new Error('Function not implemented.');
-  }
+  const handleRatingClick = (game: Game, ratingValue: number): void => {
+    // Implemente a lógica para lidar com a ação de clique na avaliação do jogo
+    // Aqui você pode atualizar o rating do jogo e persistir os dados no Firestore
+    console.log('Jogo:', game.title);
+    console.log('Rating:', ratingValue);
+  };
 
-  function handleRatingClick(game: Game, ratingValue: number): void {
-    throw new Error('Function not implemented.');
-  }
+  const saveGameData = async (game: Game) => {
+    try {
+      const { rating, ...gameData } = game; // Remover a propriedade 'rating' temporariamente
+      if (typeof rating !== 'undefined') {
+        // Verificar se o campo 'rating' está definido
+        await addDoc(collection(db, 'jogos'), {
+          ...gameData, // Usar os dados do jogo sem o campo 'rating'
+          rating: rating || 0, // Definir um valor padrão para o campo 'rating'
+        });
+      } else {
+        console.error('Error adding document: rating field is undefined');
+      }
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
+  };
+  
 
-
+  useEffect(() => {
+    // Salva os dados dos jogos no Firestore ao carregar a página
+    games.forEach((game) => {
+      saveGameData(game);
+    });
+  }, [games]);
 
   return (
     <Container maxW="container.lg" py={8}>
@@ -211,6 +244,7 @@ const Home: React.FC = () => {
           >
             {paginatedGames.map((game, index) => (
               <Card
+                key={game.game_url}
                 title={game.title}
                 thumbnail={game.thumbnail}
                 genre={game.genre}
