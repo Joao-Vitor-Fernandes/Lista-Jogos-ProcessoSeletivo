@@ -1,12 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, ButtonGroup, Container, Flex, Grid, HStack, Heading, Spinner, Text, } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Container,
+  Flex,
+  Grid,
+  HStack,
+  Heading,
+  Spinner,
+  Text,
+} from '@chakra-ui/react';
 import axios from 'axios';
 import { Card } from '@/components/Card/card';
 import { CampoPesquisa } from '@/components/CampoPesquisa/campoPesquisa';
 import { SelectGenre } from '@/components/CampoSelect/SelectGenre';
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { auth, db } from 'config/firebase';
-import { addDoc, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+} from 'firebase/firestore';
+import { AiFillHeart } from 'react-icons/ai';
 
 type Game = {
   game_url: string;
@@ -28,7 +47,10 @@ const Home: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isFavorite, setIsFavorite] = useState(false);
   const itemsPerPage = 9;
+  const [userFavorites, setUserFavorites] = useState<string[]>([]);
+  const currentUser = auth.currentUser;
 
   useEffect(() => {
     const fetchDataGames = async () => {
@@ -81,13 +103,18 @@ const Home: React.FC = () => {
       if (selectedGenre) {
         filtered = filtered.filter((game) => game.genre === selectedGenre);
       }
+      if (isFavorite) {
+        filtered = filtered.filter((game) =>
+          userFavorites.includes(game.game_url)
+        );
+      }
 
       setFilteredGames(filtered);
       setCurrentPage(1);
     };
 
     filterGames();
-  }, [games, search, selectedGenre]);
+  }, [games, search, selectedGenre, isFavorite, userFavorites]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -137,48 +164,40 @@ const Home: React.FC = () => {
   })();
 
   const handleFavoriteClick = (game: Game): void => {
-    // Atualiza o estado do jogo para favorito
-    const updatedGames = games.map((g) => {
-      if (g.game_url === game.game_url) {
-        return { ...g, isFavorite: !g.isFavorite };
-      }
-      return g;
-    });
+    const isFavorite = userFavorites.includes(game.game_url);
 
-    setGames(updatedGames);
+    if (isFavorite) {
+      setUserFavorites((prevFavorites) =>
+        prevFavorites.filter((favorite) => favorite !== game.game_url)
+      );
+    } else {
+      setUserFavorites((prevFavorites) => [...prevFavorites, game.game_url]);
+    }
   };
 
   const handleRatingClick = (game: Game, ratingValue: number): void => {
-    // Implemente a lógica para lidar com a ação de clique na avaliação do jogo
-    // Aqui você pode atualizar o rating do jogo e persistir os dados no Firestore
     console.log('Jogo:', game.title);
     console.log('Rating:', ratingValue);
   };
 
-  const saveGameData = async (game: Game) => {
+  const saveFavoriteGames = async (favoriteGames: string[]) => {
     try {
-      const { rating, ...gameData } = game; // Remover a propriedade 'rating' temporariamente
-      if (typeof rating !== 'undefined') {
-        // Verificar se o campo 'rating' está definido
-        await addDoc(collection(db, 'jogos'), {
-          ...gameData, // Usar os dados do jogo sem o campo 'rating'
-          rating: rating || 0, // Definir um valor padrão para o campo 'rating'
-        });
+      if (currentUser) {
+        const userId = currentUser.uid;
+        await setDoc(doc(db, 'users', userId), { favoriteGames });
       } else {
-        console.error('Error adding document: rating field is undefined');
+        console.error('User is not logged in');
       }
-    } catch (e) {
-      console.error('Error adding document: ', e);
+    } catch (error) {
+      console.error('Error saving favorite games:', error);
     }
   };
-  
+
 
   useEffect(() => {
-    // Salva os dados dos jogos no Firestore ao carregar a página
-    games.forEach((game) => {
-      saveGameData(game);
-    });
-  }, [games]);
+    saveFavoriteGames(userFavorites);
+  }, [userFavorites]);
+
 
   return (
     <Container maxW="container.lg" py={8}>
@@ -205,6 +224,20 @@ const Home: React.FC = () => {
             onChange={handleGenreChange}
             genres={uniqueGenres}
           />
+          {currentUser && (
+            <Button
+              variant={'ghost' && 'link'}
+              onClick={() => setIsFavorite(!isFavorite)}
+              color={isFavorite ? 'white' : '#617582'}
+              transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+              _hover={{
+                color: "white",
+                boxShadow: "inset 0 -1px 0 white",
+              }}
+            >
+              <AiFillHeart color={isFavorite ? 'red' : 'white'} />
+            </Button>
+          )}
         </Box>
       </HStack>
 
@@ -250,7 +283,7 @@ const Home: React.FC = () => {
                 genre={game.genre}
                 short_description={game.short_description}
                 game_url={game.game_url}
-                isFavorite={game.isFavorite}
+                isFavorite={userFavorites.includes(game.game_url)}
                 rating={game.rating}
                 onFavoriteClick={() => handleFavoriteClick(game)}
                 onRatingClick={(ratingValue) => handleRatingClick(game, ratingValue)}

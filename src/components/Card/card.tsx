@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Box, Button, GridItem, Heading, Text } from '@chakra-ui/react';
+import { Box, Button, GridItem, HStack, Heading, Text } from '@chakra-ui/react';
 import { Image } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import { BsStarFill, BsStarHalf, BsStar } from 'react-icons/bs';
+import { BsStarFill, BsStarHalf, BsStar, BsBorderBottom } from 'react-icons/bs';
 import { auth } from 'config/firebase';
 
 type CardProps = {
@@ -30,11 +30,8 @@ export function Card({
     onRatingClick,
 }: CardProps) {
     const router = useRouter();
+    const [isHovered, setIsHovered] = useState(false);
     const [userRating, setUserRating] = useState<number | null>(null);
-
-    const handleButtonClick = () => {
-        window.open(game_url, '_blank');
-    };
 
     const handleFavoriteButtonClick = (
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -56,6 +53,14 @@ export function Card({
         }
     };
 
+    const handleCardHover = () => {
+        setIsHovered(true);
+    };
+
+    const handleCardLeave = () => {
+        setIsHovered(false);
+    };
+
     const renderFavoriteButton = () => {
         if (isFavorite) {
             return (
@@ -67,7 +72,7 @@ export function Card({
                     _hover={{
                         color: 'white',
                     }}
-                    onClick={handleFavoriteButtonClick}
+                    onClick={auth.currentUser ? handleFavoriteButtonClick : handleLoginRedirect}
                 >
                     <AiFillHeart color="red" />
                 </Button>
@@ -82,7 +87,7 @@ export function Card({
                     _hover={{
                         color: 'white',
                     }}
-                    onClick={handleFavoriteButtonClick}
+                    onClick={auth.currentUser ? handleFavoriteButtonClick : handleLoginRedirect}
                 >
                     <AiOutlineHeart />
                 </Button>
@@ -96,7 +101,7 @@ export function Card({
 
         const ratingButtons = [];
 
-        // Ajuste para exibir 4 estrelas
+        // Renderizar as 4 estrelas
         for (let i = 0; i < 4; i++) {
             ratingButtons.push(
                 <Button
@@ -108,7 +113,15 @@ export function Card({
                     _hover={{
                         color: 'white',
                     }}
-                    onClick={(event) => handleRatingButtonClick(event, i + 1)}
+                    onClick={(event) => {
+                        if (auth.currentUser) {
+                            handleRatingButtonClick(event, i + 1);
+                        } else {
+                            handleLoginRedirect();
+                        }
+                    }}
+                    marginRight="-16px"
+                    pl={'-8px'}
                 >
                     {i + 1 <= (userRating !== null ? userRating : fullStars) ? (
                         <BsStarFill />
@@ -124,6 +137,8 @@ export function Card({
         return ratingButtons;
     };
 
+
+
     const user = auth.currentUser; // Obtém o usuário atualmente autenticado
 
     const handleLoginRedirect = () => {
@@ -131,22 +146,17 @@ export function Card({
     };
 
     return (
-        <GridItem
-            as="section"
-            mx={{ base: '0', sm: '8', xs: '0', md: '0', lg: '0' }}
-        >
+        <GridItem as="article" mx={{ base: '0', sm: '8', xs: '0', md: '0', lg: '0' }}>
             <Box
                 bg="#1c242c"
                 borderRadius="8"
                 overflow="hidden"
-                transition="border-color 0.3s"
-                _hover={{ borderColor: 'white' }}
-                borderWidth="1px"
-                borderColor="transparent"
                 cursor="pointer"
-                w={'100%'}
-                minW={'250px'}
-                minH={'350px'}
+                transition="transform .3s ease-in-out, box-shadow .3s ease-in-out"
+                transform={isHovered ? 'scale(1.05)' : 'scale(1)'}
+                boxShadow={isHovered ? 'md' : 'none'}
+                onMouseEnter={handleCardHover}
+                onMouseLeave={handleCardLeave}
             >
                 <Box
                     as="div"
@@ -176,26 +186,11 @@ export function Card({
                         </Text>
                     )}
                 </Box>
-                <Box as="div" p={4} display="flex" justifyContent="end" gap={'2'}>
-                    <a href={game_url} target="_blank" rel="noopener noreferrer">
-                        <Button
-                            borderRadius="0"
-                            color="#316be2"
-                            variant="link"
-                            transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
-                            _hover={{
-                                color: 'white',
-                                boxShadow: 'inset 0 -2px 0 white',
-                            }}
-                            onClick={handleButtonClick}
-                        >
-                            Leia Mais
-                        </Button>
-                    </a>
+                <Box as="div" pr={6} py={4} pl={1} display="flex" justifyContent="space-between" gap={'2'}>
                     {user ? (
                         <>
                             {renderFavoriteButton()}
-                            <Box ml={2}>{renderRatingButtons()}</Box>
+                            <Box ml={'-6rem'}>{renderRatingButtons()}</Box>
                         </>
                     ) : (
                         <>
@@ -220,11 +215,26 @@ export function Card({
                                     color: 'white',
                                 }}
                                 onClick={handleLoginRedirect}
+                                ml={'-10rem'}
                             >
                                 <BsStar />
                             </Button>
                         </>
                     )}
+                    <a href={game_url} target="_blank" rel="noopener noreferrer">
+                        <Button
+                            borderRadius="0"
+                            color="#316be2"
+                            variant="link"
+                            transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                            _hover={{
+                                color: 'white',
+                                boxShadow: 'inset 0 -2px 0 white',
+                            }}
+                        >
+                            Leia Mais
+                        </Button>
+                    </a>
                 </Box>
             </Box>
         </GridItem>
