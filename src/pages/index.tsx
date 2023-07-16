@@ -48,8 +48,10 @@ const Home: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const itemsPerPage = 9;
   const [userFavorites, setUserFavorites] = useState<string[]>([]);
+  const [userRatings, setUserRatings] = useState<{ [gameUrl: string]: number }>({});
   const currentUser = auth.currentUser;
 
   useEffect(() => {
@@ -109,12 +111,21 @@ const Home: React.FC = () => {
         );
       }
 
+      // Ordenação por avaliação
+      filtered.sort((a, b) => {
+        if (sortDirection === 'asc') {
+          return a.rating - b.rating;
+        } else {
+          return b.rating - a.rating;
+        }
+      });
+
       setFilteredGames(filtered);
       setCurrentPage(1);
     };
 
     filterGames();
-  }, [games, search, selectedGenre, isFavorite, userFavorites]);
+  }, [games, search, selectedGenre, isFavorite, userFavorites, sortDirection]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -175,16 +186,37 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleRatingClick = (game: Game, ratingValue: number): void => {
-    console.log('Jogo:', game.title);
-    console.log('Rating:', ratingValue);
+  const handleSortClick = () => {
+    setSortDirection((prevDirection) => (prevDirection === 'asc' ? 'desc' : 'asc'));
   };
+
+  const handleRatingClick = (game: Game, ratingValue: number): void => {
+    saveGameRating(game, ratingValue);
+  };
+
+  // ...
 
   const saveFavoriteGames = async (favoriteGames: string[]) => {
     try {
       if (currentUser) {
         const userId = currentUser.uid;
-        await setDoc(doc(db, 'users', userId), { favoriteGames });
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const existingData = {
+            favoriteGames: userData.favoriteGames || [],
+            ratings: userData.ratings || {},
+          };
+
+          const newData = {
+            ...existingData,
+            favoriteGames,
+          };
+
+          await setDoc(userDocRef, newData);
+        }
       } else {
         console.error('User is not logged in');
       }
@@ -193,11 +225,67 @@ const Home: React.FC = () => {
     }
   };
 
+  const saveGameRating = async (game: Game, ratingValue: number) => {
+    try {
+      if (currentUser) {
+        const userId = currentUser.uid;
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const existingData = {
+            favoriteGames: userData.favoriteGames || [],
+            ratings: userData.ratings || {},
+          };
+
+          const newRatings = {
+            ...existingData.ratings,
+            [game.game_url]: ratingValue,
+          };
+
+          const newData = {
+            ...existingData,
+            ratings: newRatings,
+          };
+
+          await setDoc(userDocRef, newData);
+        }
+      } else {
+        console.error('User is not logged in');
+      }
+    } catch (error) {
+      console.error('Error saving game rating:', error);
+    }
+  };
+
+  // ...
 
   useEffect(() => {
     saveFavoriteGames(userFavorites);
   }, [userFavorites]);
 
+  useEffect(() => {
+    const loadUserFavoritesAndRatings = async () => {
+      try {
+        if (currentUser) {
+          const userId = currentUser.uid;
+          const userDocRef = doc(db, 'users', userId);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            setUserFavorites(userData.favoriteGames || []);
+            setUserRatings(userData.ratings || {});
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user favorites and ratings:', error);
+      }
+    };
+
+    loadUserFavoritesAndRatings();
+  }, [currentUser]);
 
   return (
     <Container maxW="container.lg" py={8}>
@@ -231,11 +319,25 @@ const Home: React.FC = () => {
               color={isFavorite ? 'white' : '#617582'}
               transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
               _hover={{
-                color: "white",
-                boxShadow: "inset 0 -1px 0 white",
+                color: 'white',
+                boxShadow: 'inset 0 -1px 0 white',
               }}
             >
               <AiFillHeart color={isFavorite ? 'red' : 'white'} />
+            </Button>
+          )}
+          {currentUser && (
+            <Button
+              variant={'ghost' && 'link'}
+              onClick={handleSortClick}
+              color={'white'}
+              transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+              _hover={{
+                color: 'white',
+                boxShadow: 'inset 0 -1px 0 white',
+              }}
+            >
+              Avaliação {sortDirection === 'asc' ? '▲' : '▼'}
             </Button>
           )}
         </Box>
@@ -284,7 +386,7 @@ const Home: React.FC = () => {
                 short_description={game.short_description}
                 game_url={game.game_url}
                 isFavorite={userFavorites.includes(game.game_url)}
-                rating={game.rating}
+                rating={userRatings[game.game_url] || game.rating}
                 onFavoriteClick={() => handleFavoriteClick(game)}
                 onRatingClick={(ratingValue) => handleRatingClick(game, ratingValue)}
               />
