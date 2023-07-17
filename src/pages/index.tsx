@@ -10,6 +10,7 @@ import {
   Heading,
   Spinner,
   Text,
+  Tooltip,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { Card } from '@/components/Card/card';
@@ -113,10 +114,13 @@ const Home: React.FC = () => {
 
       // Ordenação por avaliação
       filtered.sort((a, b) => {
+        const ratingA = getGameRating(a);
+        const ratingB = getGameRating(b);
+
         if (sortDirection === 'asc') {
-          return a.rating - b.rating;
+          return ratingA - ratingB;
         } else {
-          return b.rating - a.rating;
+          return ratingB - ratingA;
         }
       });
 
@@ -125,7 +129,7 @@ const Home: React.FC = () => {
     };
 
     filterGames();
-  }, [games, search, selectedGenre, isFavorite, userFavorites, sortDirection]);
+  }, [games, search, selectedGenre, isFavorite, userFavorites, sortDirection, userRatings]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -192,9 +196,26 @@ const Home: React.FC = () => {
 
   const handleRatingClick = (game: Game, ratingValue: number): void => {
     saveGameRating(game, ratingValue);
+
+    setFilteredGames((prevGames) => {
+      const updatedGames = [...prevGames];
+      updatedGames.sort((a, b) => {
+        const ratingA = getGameRating(a);
+        const ratingB = getGameRating(b);
+        if (sortDirection === 'asc') {
+          return ratingA - ratingB;
+        } else {
+          return ratingB - ratingA;
+        }
+      });
+      return updatedGames;
+    });
   };
 
-  // ...
+  const getGameRating = (game: Game): number => {
+    const userRating = userRatings[game.game_url];
+    return userRating !== undefined ? userRating : game.rating;
+  };
 
   const saveFavoriteGames = async (favoriteGames: string[]) => {
     try {
@@ -259,8 +280,6 @@ const Home: React.FC = () => {
     }
   };
 
-  // ...
-
   useEffect(() => {
     saveFavoriteGames(userFavorites);
   }, [userFavorites]);
@@ -313,32 +332,36 @@ const Home: React.FC = () => {
             genres={uniqueGenres}
           />
           {currentUser && (
-            <Button
-              variant={'ghost' && 'link'}
-              onClick={() => setIsFavorite(!isFavorite)}
-              color={isFavorite ? 'white' : '#617582'}
-              transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
-              _hover={{
-                color: 'white',
-                boxShadow: 'inset 0 -1px 0 white',
-              }}
-            >
-              <AiFillHeart color={isFavorite ? 'red' : 'white'} />
-            </Button>
+            <Tooltip label="Favoritos">
+              <Button
+                variant={'ghost' && 'link'}
+                onClick={() => setIsFavorite(!isFavorite)}
+                color={isFavorite ? 'white' : '#617582'}
+                transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                _hover={{
+                  color: 'white',
+                  boxShadow: 'inset 0 -1px 0 white',
+                }}
+              >
+                <AiFillHeart color={isFavorite ? 'red' : 'white'} />
+              </Button>
+            </Tooltip>
           )}
           {currentUser && (
-            <Button
-              variant={'ghost' && 'link'}
-              onClick={handleSortClick}
-              color={'white'}
-              transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
-              _hover={{
-                color: 'white',
-                boxShadow: 'inset 0 -1px 0 white',
-              }}
-            >
-              Avaliação {sortDirection === 'asc' ? '▲' : '▼'}
-            </Button>
+            <Tooltip label="Avaliação">
+              <Button
+                variant={'ghost' && 'link'}
+                onClick={handleSortClick}
+                color={'white'}
+                transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                _hover={{
+                  color: 'white',
+                  boxShadow: 'inset 0 -1px 0 white',
+                }}
+              >
+                {sortDirection === 'asc' ? '▲' : '▼'}
+              </Button>
+            </Tooltip>
           )}
         </Box>
       </HStack>
@@ -386,9 +409,10 @@ const Home: React.FC = () => {
                 short_description={game.short_description}
                 game_url={game.game_url}
                 isFavorite={userFavorites.includes(game.game_url)}
-                rating={userRatings[game.game_url] || game.rating}
+                rating={getGameRating(game)}
                 onFavoriteClick={() => handleFavoriteClick(game)}
                 onRatingClick={(ratingValue) => handleRatingClick(game, ratingValue)}
+                data-game-url={game.game_url}
               />
             ))}
           </Grid>

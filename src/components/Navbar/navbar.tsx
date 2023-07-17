@@ -92,7 +92,7 @@ export function Navbar() {
 
             <Flex
                 as="section"
-                display={["none", "none", "none", "flex", "flex", "flex"]}
+                display={["none", "none", "none", "none", "flex", "flex"]}
                 gap={'4'}
             >
                 {!isLoading && user ? (
@@ -191,7 +191,7 @@ export function Navbar() {
                     as={IconButton}
                     aria-label="Options"
                     icon={<HamburgerIcon />}
-                    display={["flex", "flex", "flex", "none", "none", "none"]}
+                    display={["flex", "flex", "flex", "flex", "none", "none"]}
                     bg="transparent"
                     variant="outline"
                     color="white"

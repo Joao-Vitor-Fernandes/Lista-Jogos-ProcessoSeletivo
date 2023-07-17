@@ -43,9 +43,9 @@ const Cadastro: React.FC = () => {
     }, [router]);
 
     return (
-        <Container maxW="container.sm" py={8}>
+        <Container py={24}>
             <Box bg="#1c242c" p={8} borderRadius="md" boxShadow="md">
-                <Heading as="h1" fontSize="xl" mb={4}>
+                <Heading as="h1" fontSize="xl" mb={4} textAlign={'center'}>
                     Cadastro
                 </Heading>
 
@@ -60,9 +60,9 @@ const Cadastro: React.FC = () => {
                         <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                     </FormControl>
 
-                    <Button colorScheme="teal" onClick={handleSignCreate}>
-                        Criar conta
-                    </Button>
+                    <Text mt={4} fontSize="sm" color="gray.500">
+                        Já tem uma conta? <Link href="/login">Faça login aqui</Link>.
+                    </Text>
 
                     {errorMessage && (
                         <Text mt={4} fontSize="sm" color="red.500">
@@ -70,9 +70,23 @@ const Cadastro: React.FC = () => {
                         </Text>
                     )}
 
-                    <Text mt={4} fontSize="sm" color="gray.500">
-                        Já tem uma conta? <Link href="/login">Faça login aqui</Link>.
-                    </Text>
+                    <Box display={'flex'} justifyContent={'end'} mr={'4'}>
+                        <Button colorScheme="teal" onClick={handleSignCreate}
+                            fontSize="20px"
+                            borderRadius={'0'}
+                            fontWeight="500"
+                            color="#316be2"
+                            variant={'link'}
+                            position="relative"
+                            transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
+                            _hover={{
+                                color: "white",
+                                boxShadow: "inset 0 -2px 0 white",
+                            }}
+                        >
+                            Criar conta
+                        </Button>
+                    </Box>
                 </form>
             </Box>
         </Container>

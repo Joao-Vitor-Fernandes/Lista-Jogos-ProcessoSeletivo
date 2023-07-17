@@ -81,7 +81,7 @@ export function Card({
             return (
                 <Button
                     borderRadius="0"
-                    color="#316be2"
+                    color="red"
                     variant="link"
                     transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
                     _hover={{
@@ -107,7 +107,7 @@ export function Card({
                 <Button
                     key={i}
                     borderRadius="0"
-                    color={userRating !== null && i < userRating ? '#d1b238' : '#316be2'}
+                    color={userRating !== null && i < userRating ? '#d1b238' : '#d1b238'}
                     variant="link"
                     transition="color .3s ease-in-out, box-shadow .3s ease-in-out"
                     _hover={{
